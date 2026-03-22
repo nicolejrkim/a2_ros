@@ -16,7 +16,7 @@ def generate_launch_description():
     )
 
     teleop_joy = Node(
-        package='a2_sim',
+        package='a2_ros',
         executable='teleop_joy',
         output='screen',
         parameters=[{
