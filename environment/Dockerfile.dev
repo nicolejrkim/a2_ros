@@ -112,6 +112,12 @@ RUN : "${UID:?UID build arg is required}" && : "${GID:?GID build arg is required
 # Remap to the host UID/GID so bind-mounted files have correct ownership.
 RUN groupmod -g ${GID} ubuntu && usermod -u ${UID} -g ${GID} ubuntu
 
+# Grant access to /dev/input/event* devices. The host input group GID (107) may differ
+# from the container's input group, so we add the user to whatever group owns GID 107.
+ARG INPUT_GID=107
+RUN groupadd -g ${INPUT_GID} host_input 2>/dev/null || true && \
+    getent group ${INPUT_GID} | cut -d: -f1 | xargs -I{} usermod -aG {} ${USER}
+
 # Set up home directory extras: persistent history dir and sudo marker.
 RUN mkdir -p /home/$USER/.bash_history_dir /home/$USER/.ros && \
     touch /home/$USER/.sudo_as_admin_successful && \
